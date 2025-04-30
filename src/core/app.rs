@@ -1,6 +1,4 @@
-use clap::Parser;
-
-use super::clap::Args;
+use super::config::Config;
 
 pub type AppResult<T> = anyhow::Result<T>;
 
@@ -12,9 +10,12 @@ impl App {
     }
 
     pub async fn run(&self) -> AppResult<()> {
-        let args = Args::parse();
+        let mut config = Config::default();
+        let result = config.load_from_file();
 
-        println!("{:?}", args);
+        if let Err(_) = result {
+            config.prompt_user().await?;
+        }
 
         Ok(())
     }

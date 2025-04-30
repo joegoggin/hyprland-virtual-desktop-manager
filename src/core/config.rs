@@ -1,0 +1,133 @@
+use std::{
+    collections::HashMap,
+    fs::{self, File},
+    io::{Read, Write},
+    path::Path,
+    process,
+};
+
+use colorized::{Colors, colorize_print, colorize_println};
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
+
+use crate::utils::{
+    directory::get_home_dir, prompt::Prompt, terminal_command::TerminalCommand, value::GetOrDefault,
+};
+
+use super::{app::AppResult, monitor::Monitor};
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Config {
+    pub monitors: HashMap<String, Monitor>,
+}
+
+impl Default for Config {
+    fn default() -> Self {
+        Self {
+            monitors: HashMap::new(),
+        }
+    }
+}
+
+impl Config {
+    pub fn new(monitors: HashMap<String, Monitor>) -> Self {
+        Self { monitors }
+    }
+
+    pub fn load_from_file(&mut self) -> AppResult<()> {
+        let path = self.get_file_path()?;
+        let mut data = String::new();
+        let mut file = File::open(Path::new(&path))?;
+        file.read_to_string(&mut data)?;
+
+        let config: Config = serde_json::from_str::<Config>(&data)?;
+
+        self.monitors = config.monitors;
+
+        Ok(())
+    }
+
+    pub async fn prompt_user(&mut self) -> AppResult<()> {
+        colorize_println("Warning: No config file found\n", Colors::YellowFg);
+
+        let prompt = Prompt::new("Would you like to create a new config?");
+
+        if !prompt.yes_or_no()? {
+            TerminalCommand::clear()?;
+            process::exit(0);
+        }
+
+        let output = TerminalCommand::new("hyprctl monitors -j").run_with_output()?;
+        let json: Value = serde_json::from_str(&output)?;
+        let mut monitor_vec: Vec<Monitor> = vec![];
+
+        match json {
+            Value::Array(monitor_values) => {
+                for value in monitor_values {
+                    let id = value.get_number_or_default("id");
+                    let name = value.get_string_or_default("name");
+                    let description = value.get_string_or_default("description");
+                    let monitor = Monitor::new(id, name, description);
+
+                    monitor_vec.push(monitor);
+                }
+            }
+            _ => {}
+        }
+
+        TerminalCommand::clear()?;
+
+        colorize_println(
+            format!("We have detected {} monitors:", monitor_vec.len()),
+            Colors::BlueFg,
+        );
+
+        for monitor in &monitor_vec {
+            colorize_print("\nname: ", Colors::GreenFg);
+            colorize_println(format!("{}", monitor.name), Colors::Reset);
+            colorize_print("description: ", Colors::GreenFg);
+            colorize_println(format!("{}\n", monitor.description), Colors::Reset);
+        }
+
+        colorize_println(
+            "Set a key for each monitor (This key will be used to identify your monitor while using this tool)",
+            Colors::BlueFg,
+        );
+
+        let mut monitors: HashMap<String, Monitor> = HashMap::new();
+
+        for monitor in monitor_vec {
+            let prompt = Prompt::new(format!("\nChoose a key for '{}'", monitor.name));
+            let key = prompt.string()?;
+
+            monitors.insert(key, monitor);
+        }
+
+        self.monitors = monitors;
+        self.write_to_file()?;
+
+        colorize_println("\nConfig successfully created!\n", Colors::GreenFg);
+
+        Ok(())
+    }
+
+    pub fn write_to_file(&self) -> AppResult<()> {
+        let data = serde_json::to_string_pretty(self)?;
+        let file_path = self.get_file_path()?;
+
+        if let Some(parent) = Path::new(&file_path).parent() {
+            fs::create_dir_all(parent)?;
+        }
+
+        let mut file = File::create(file_path.clone())?;
+        file.write_all(data.as_bytes())?;
+
+        Ok(())
+    }
+
+    fn get_file_path(&self) -> AppResult<String> {
+        let home_dir = get_home_dir()?;
+
+        Ok(format!("{}/.config/hyprland-vdm/config.json", home_dir))
+    }
+}
