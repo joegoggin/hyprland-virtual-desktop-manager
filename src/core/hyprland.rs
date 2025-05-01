@@ -1,6 +1,6 @@
 use anyhow::Error;
 
-use crate::utils::{terminal_command::TerminalCommand, value::GetOrDefault};
+use crate::utils::value::GetOrDefault;
 
 use super::{app::AppResult, config::Config, hyprctl::Hyprctl, monitor::Monitor};
 
@@ -55,9 +55,8 @@ impl Hyprland {
 
         if let Some(monitor) = monitor {
             let active_workspace_id = self.get_active_workspace_id(monitor.id)?;
-            let command = format!("hyprctl dispatch workspace {}", active_workspace_id);
 
-            TerminalCommand::new(command).run()?;
+            Hyprctl::go_to_workspace(active_workspace_id)?;
         }
 
         Ok(())
