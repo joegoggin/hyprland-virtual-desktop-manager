@@ -48,6 +48,8 @@ impl Config {
     }
 
     pub async fn prompt_user(&mut self) -> AppResult<()> {
+        TerminalCommand::clear()?;
+
         colorize_println("Warning: No config file found\n", Colors::YellowFg);
 
         let prompt = Prompt::new("Would you like to create a new config?");
@@ -57,17 +59,31 @@ impl Config {
             process::exit(0);
         }
 
-        let output = TerminalCommand::new("hyprctl monitors -j").run_with_output()?;
-        let json: Value = serde_json::from_str(&output)?;
+        let monitors_output = TerminalCommand::new("hyprctl monitors -j").run_with_output()?;
+        let monitors_json: Value = serde_json::from_str(&monitors_output)?;
         let mut monitor_vec: Vec<Monitor> = vec![];
 
-        match json {
+        match monitors_json {
             Value::Array(monitor_values) => {
-                for value in monitor_values {
+                for (i, value) in monitor_values.iter().enumerate() {
                     let id = value.get_number_or_default("id");
                     let name = value.get_string_or_default("name");
                     let description = value.get_string_or_default("description");
-                    let monitor = Monitor::new(id, name, description);
+                    let mut min_workspace_id: u64 = 1;
+
+                    if i > 0 {
+                        if let Some(prev_monitor) = monitor_vec.get(i - 1) {
+                            min_workspace_id = prev_monitor.max_workspace_id + 1;
+                        }
+                    }
+
+                    let monitor = Monitor::new(
+                        id,
+                        name,
+                        description,
+                        min_workspace_id,
+                        min_workspace_id + 4,
+                    );
 
                     monitor_vec.push(monitor);
                 }
@@ -102,6 +118,8 @@ impl Config {
 
             monitors.insert(key, monitor);
         }
+
+        println!("{:#?}", monitors);
 
         self.monitors = monitors;
         self.write_to_file()?;
