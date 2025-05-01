@@ -31,15 +31,9 @@ impl Hyprland {
     }
 
     pub fn prev_workspace(&self) -> AppResult<()> {
-        let monitor = self.get_active_monitor()?;
-        let workspace_id = self.get_active_workspace_id(monitor.id)?;
-        let mut new_workspace_id = workspace_id - 1;
+        let prev_workspace_id = self.get_prev_workspace_id()?;
 
-        if new_workspace_id < monitor.min_workspace_id {
-            new_workspace_id = monitor.max_workspace_id;
-        }
-
-        Hyprctl::go_to_workspace(new_workspace_id)?;
+        Hyprctl::go_to_workspace(prev_workspace_id)?;
 
         Ok(())
     }
@@ -79,6 +73,17 @@ impl Hyprland {
         Ok(())
     }
 
+    pub fn move_window_to_prev_workspace(&self) -> AppResult<()> {
+        let monitor = self.get_active_monitor()?;
+        let workspace_id = self.get_active_workspace_id(monitor.id)?;
+        let prev_workspace_id = self.get_prev_workspace_id()?;
+
+        Hyprctl::move_to_workspace(prev_workspace_id)?;
+        Hyprctl::go_to_workspace(workspace_id)?;
+
+        Ok(())
+    }
+
     fn get_next_workspace_id(&self) -> AppResult<u64> {
         let monitor = self.get_active_monitor()?;
         let workspace_id = self.get_active_workspace_id(monitor.id)?;
@@ -86,6 +91,18 @@ impl Hyprland {
 
         if next_workspace_id > monitor.max_workspace_id {
             next_workspace_id = monitor.min_workspace_id;
+        }
+
+        Ok(next_workspace_id)
+    }
+
+    fn get_prev_workspace_id(&self) -> AppResult<u64> {
+        let monitor = self.get_active_monitor()?;
+        let workspace_id = self.get_active_workspace_id(monitor.id)?;
+        let mut next_workspace_id = workspace_id - 1;
+
+        if next_workspace_id < monitor.min_workspace_id {
+            next_workspace_id = monitor.max_workspace_id;
         }
 
         Ok(next_workspace_id)

@@ -41,7 +41,7 @@ impl Command {
                 hyprland.move_window_to_monitor(key.to_string())?
             }
             Command::MoveWindowToNextWorkspace => hyprland.move_window_to_next_workspace()?,
-            Command::MoveWindowToPrevWorkspace => println!("MoveWindowToPrevWorkspace"),
+            Command::MoveWindowToPrevWorkspace => hyprland.move_window_to_prev_workspace()?,
         }
 
         Ok(())
