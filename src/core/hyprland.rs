@@ -14,6 +14,21 @@ impl Hyprland {
         Self { config }
     }
 
+    pub fn initialize_workspaces(&self) -> AppResult<()> {
+        for (_, monitor) in &self.config.monitors {
+            let command = format!("hyprctl dispatch workspace {}", monitor.min_workspace_id);
+            TerminalCommand::new(command).run()?;
+
+            let command = format!(
+                "hyprctl dispatch movecurrentworkspacetomonitor {}",
+                monitor.name
+            );
+            TerminalCommand::new(command).run()?;
+        }
+
+        Ok(())
+    }
+
     pub fn focus_monitor(&self, key: String) -> AppResult<()> {
         let monitor = self.config.monitors.get(&key);
 
@@ -37,6 +52,18 @@ impl Hyprland {
         }
 
         Ok(monitor_values)
+    }
+
+    fn get_workspace_values(&self) -> AppResult<Vec<Value>> {
+        let output = TerminalCommand::new("hyprctl workspaces -j").run_with_output()?;
+        let json: Value = serde_json::from_str(&output)?;
+        let mut worspace_values: Vec<Value> = vec![];
+
+        if let Value::Array(values) = json {
+            worspace_values = values;
+        }
+
+        Ok(worspace_values)
     }
 
     fn get_active_monitor_id(&self) -> AppResult<u64> {

@@ -19,19 +19,24 @@ use super::{app::AppResult, monitor::Monitor};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Config {
     pub monitors: HashMap<String, Monitor>,
+    pub main_monitor: String,
 }
 
 impl Default for Config {
     fn default() -> Self {
         Self {
             monitors: HashMap::new(),
+            main_monitor: String::new(),
         }
     }
 }
 
 impl Config {
-    pub fn new(monitors: HashMap<String, Monitor>) -> Self {
-        Self { monitors }
+    pub fn new(monitors: HashMap<String, Monitor>, main_monitor_key: String) -> Self {
+        Self {
+            monitors,
+            main_monitor: main_monitor_key,
+        }
     }
 
     pub fn load_from_file(&mut self) -> AppResult<()> {
@@ -115,6 +120,14 @@ impl Config {
         for monitor in monitor_vec {
             let prompt = Prompt::new(format!("\nChoose a key for '{}'", monitor.name));
             let key = prompt.string()?;
+
+            if self.main_monitor == "" {
+                let prompt = Prompt::new("\nIs this your main monitor?");
+
+                if prompt.yes_or_no()? {
+                    self.main_monitor = key.clone();
+                }
+            }
 
             monitors.insert(key, monitor);
         }
