@@ -62,6 +62,18 @@ impl Hyprland {
         Ok(())
     }
 
+    pub fn move_window_to_monitor(&self, key: String) -> AppResult<()> {
+        let monitor = self.config.monitors.get(&key);
+
+        if let Some(monitor) = monitor {
+            let active_workspace_id = self.get_active_workspace_id(monitor.id)?;
+
+            Hyprctl::move_to_workspace(active_workspace_id)?;
+        }
+
+        Ok(())
+    }
+
     fn get_active_monitor(&self) -> AppResult<Monitor> {
         let active_monitor_id = self.get_active_monitor_id()?;
 
