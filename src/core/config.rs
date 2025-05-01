@@ -8,10 +8,13 @@ use std::{
 
 use colorized::{Colors, colorize_print, colorize_println};
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 
-use crate::utils::{
-    directory::get_home_dir, prompt::Prompt, terminal_command::TerminalCommand, value::GetOrDefault,
+use crate::{
+    core::hyprctl::Hyprctl,
+    utils::{
+        directory::get_home_dir, prompt::Prompt, terminal_command::TerminalCommand,
+        value::GetOrDefault,
+    },
 };
 
 use super::{app::AppResult, monitor::Monitor};
@@ -64,36 +67,30 @@ impl Config {
             process::exit(0);
         }
 
-        let monitors_output = TerminalCommand::new("hyprctl monitors -j").run_with_output()?;
-        let monitors_json: Value = serde_json::from_str(&monitors_output)?;
+        let monitor_values = Hyprctl::monitors()?;
         let mut monitor_vec: Vec<Monitor> = vec![];
 
-        match monitors_json {
-            Value::Array(monitor_values) => {
-                for (i, value) in monitor_values.iter().enumerate() {
-                    let id = value.get_number_or_default("id");
-                    let name = value.get_string_or_default("name");
-                    let description = value.get_string_or_default("description");
-                    let mut min_workspace_id: u64 = 1;
+        for (i, value) in monitor_values.iter().enumerate() {
+            let id = value.get_number_or_default("id");
+            let name = value.get_string_or_default("name");
+            let description = value.get_string_or_default("description");
+            let mut min_workspace_id: u64 = 1;
 
-                    if i > 0 {
-                        if let Some(prev_monitor) = monitor_vec.get(i - 1) {
-                            min_workspace_id = prev_monitor.max_workspace_id + 1;
-                        }
-                    }
-
-                    let monitor = Monitor::new(
-                        id,
-                        name,
-                        description,
-                        min_workspace_id,
-                        min_workspace_id + 4,
-                    );
-
-                    monitor_vec.push(monitor);
+            if i > 0 {
+                if let Some(prev_monitor) = monitor_vec.get(i - 1) {
+                    min_workspace_id = prev_monitor.max_workspace_id + 1;
                 }
             }
-            _ => {}
+
+            let monitor = Monitor::new(
+                id,
+                name,
+                description,
+                min_workspace_id,
+                min_workspace_id + 4,
+            );
+
+            monitor_vec.push(monitor);
         }
 
         TerminalCommand::clear()?;
