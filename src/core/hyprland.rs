@@ -17,14 +17,7 @@ impl Hyprland {
 
     pub fn initialize_workspaces(&self) -> AppResult<()> {
         for (_, monitor) in &self.config.monitors {
-            let command = format!("hyprctl dispatch workspace {}", monitor.min_workspace_id);
-            TerminalCommand::new(command).run()?;
-
-            let command = format!(
-                "hyprctl dispatch movecurrentworkspacetomonitor {}",
-                monitor.name
-            );
-            TerminalCommand::new(command).run()?;
+            Hyprctl::create_workspace(monitor.min_workspace_id, monitor.name.to_string())?;
         }
 
         Ok(())

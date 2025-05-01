@@ -20,4 +20,17 @@ impl Hyprctl {
             "Failed to parse json from `hyprctl monitors -j`",
         ))
     }
+
+    pub fn create_workspace(workspace_id: u64, monitor_name: String) -> AppResult<()> {
+        let command = format!("hyprctl dispatch workspace {}", workspace_id);
+        TerminalCommand::new(command).run()?;
+
+        let command = format!(
+            "hyprctl dispatch movecurrentworkspacetomonitor {}",
+            monitor_name
+        );
+        TerminalCommand::new(command).run()?;
+
+        Ok(())
+    }
 }
