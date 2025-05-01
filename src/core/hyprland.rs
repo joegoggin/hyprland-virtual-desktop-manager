@@ -70,18 +70,6 @@ impl Hyprland {
         Ok(monitor_values)
     }
 
-    fn get_workspace_values(&self) -> AppResult<Vec<Value>> {
-        let output = TerminalCommand::new("hyprctl workspaces -j").run_with_output()?;
-        let json: Value = serde_json::from_str(&output)?;
-        let mut worspace_values: Vec<Value> = vec![];
-
-        if let Value::Array(values) = json {
-            worspace_values = values;
-        }
-
-        Ok(worspace_values)
-    }
-
     fn get_active_monitor(&self) -> AppResult<Monitor> {
         let active_monitor_id = self.get_active_monitor_id()?;
 
