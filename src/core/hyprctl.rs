@@ -22,13 +22,19 @@ impl Hyprctl {
     }
 
     pub fn create_workspace(workspace_id: u64, monitor_name: String) -> AppResult<()> {
-        let command = format!("hyprctl dispatch workspace {}", workspace_id);
-        TerminalCommand::new(command).run()?;
+        Self::go_to_workspace(workspace_id)?;
 
         let command = format!(
             "hyprctl dispatch movecurrentworkspacetomonitor {}",
             monitor_name
         );
+        TerminalCommand::new(command).run()?;
+
+        Ok(())
+    }
+
+    pub fn go_to_workspace(workspace_id: u64) -> AppResult<()> {
+        let command = format!("hyprctl dispatch workspace {}", workspace_id);
         TerminalCommand::new(command).run()?;
 
         Ok(())

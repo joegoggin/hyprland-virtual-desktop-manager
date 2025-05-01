@@ -1,5 +1,4 @@
 use anyhow::Error;
-use serde_json::Value;
 
 use crate::utils::{terminal_command::TerminalCommand, value::GetOrDefault};
 
@@ -32,8 +31,7 @@ impl Hyprland {
             new_workspace_id = monitor.min_workspace_id;
         }
 
-        let command = format!("hyprctl dispatch workspace {}", new_workspace_id);
-        TerminalCommand::new(command).run()?;
+        Hyprctl::go_to_workspace(new_workspace_id)?;
 
         Ok(())
     }
@@ -47,8 +45,7 @@ impl Hyprland {
             new_workspace_id = monitor.max_workspace_id;
         }
 
-        let command = format!("hyprctl dispatch workspace {}", new_workspace_id);
-        TerminalCommand::new(command).run()?;
+        Hyprctl::go_to_workspace(new_workspace_id)?;
 
         Ok(())
     }

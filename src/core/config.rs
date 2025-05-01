@@ -8,7 +8,6 @@ use std::{
 
 use colorized::{Colors, colorize_print, colorize_println};
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 
 use crate::{
     core::hyprctl::Hyprctl,
