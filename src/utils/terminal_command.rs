@@ -30,7 +30,7 @@ impl TerminalCommand {
     }
 
     pub fn run(&self) -> AppResult<()> {
-        let status = Command::new(&self.command).status()?;
+        let status = self.get_command().status()?;
 
         if !status.success() {
             let error_message = format!("The following command failed `{}`", self.command);

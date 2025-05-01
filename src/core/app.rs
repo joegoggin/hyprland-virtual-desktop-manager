@@ -1,4 +1,6 @@
-use super::config::Config;
+use clap::Parser;
+
+use super::{clap::Args, config::Config};
 
 pub type AppResult<T> = anyhow::Result<T>;
 
@@ -16,6 +18,10 @@ impl App {
         if let Err(_) = result {
             config.prompt_user().await?;
         }
+
+        let args = Args::parse();
+
+        args.command.run(config)?;
 
         Ok(())
     }
