@@ -40,7 +40,7 @@ impl Command {
             Command::InitalizeWorkspaces => hyprland.initialize_workspaces()?,
             Command::Config => println!("Config"),
             Command::FocusMonitor { key } => hyprland.focus_monitor(key.to_string())?,
-            Command::NextWorkspace => println!("NextWorkspace"),
+            Command::NextWorkspace => hyprland.next_workspace()?,
             Command::PrevWorkspace => println!("PrevWorkspace"),
             Command::MoveWindowToMonitor { key } => {
                 println!("MoveWindowToMonitor - key: {}", key)

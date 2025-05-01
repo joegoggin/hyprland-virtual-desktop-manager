@@ -1,8 +1,9 @@
+use anyhow::Error;
 use serde_json::Value;
 
 use crate::utils::{terminal_command::TerminalCommand, value::GetOrDefault};
 
-use super::{app::AppResult, config::Config};
+use super::{app::AppResult, config::Config, monitor::Monitor};
 
 #[derive(Debug)]
 pub struct Hyprland {
@@ -25,6 +26,21 @@ impl Hyprland {
             );
             TerminalCommand::new(command).run()?;
         }
+
+        Ok(())
+    }
+
+    pub fn next_workspace(&self) -> AppResult<()> {
+        let monitor = self.get_active_monitor()?;
+        let workspace_id = self.get_active_workspace_id(monitor.id)?;
+        let mut new_workspace_id = workspace_id + 1;
+
+        if new_workspace_id > monitor.max_workspace_id {
+            new_workspace_id = monitor.min_workspace_id;
+        }
+
+        let command = format!("hyprctl dispatch workspace {}", new_workspace_id);
+        TerminalCommand::new(command).run()?;
 
         Ok(())
     }
@@ -64,6 +80,18 @@ impl Hyprland {
         }
 
         Ok(worspace_values)
+    }
+
+    fn get_active_monitor(&self) -> AppResult<Monitor> {
+        let active_monitor_id = self.get_active_monitor_id()?;
+
+        for (_, monitor) in &self.config.monitors {
+            if monitor.id == active_monitor_id {
+                return Ok(monitor.clone());
+            }
+        }
+
+        Err(Error::msg("Unable to find active monitor"))
     }
 
     fn get_active_monitor_id(&self) -> AppResult<u64> {
