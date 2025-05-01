@@ -1,6 +1,6 @@
 use clap::{Parser, Subcommand};
 
-use super::app::AppResult;
+use super::{app::AppResult, config::Config, hyprland::Hyprland};
 
 #[derive(Parser, Debug, Clone)]
 #[command(author, version, about)]
@@ -15,13 +15,13 @@ pub enum Command {
     /// Setup monitor configuration
     Config,
     /// Focus a specific monitor
-    FocusMonitor { monitor_id: u8 },
+    FocusMonitor { key: String },
     /// Go to the next workspace on the currently focused monitor
     NextWorkspace,
     /// Go to the previous workspace on the currently focused monitor
     PrevWorkspace,
     /// Move a window to a specific monitor
-    MoveWindowToMonitor { monitor_id: u8 },
+    MoveWindowToMonitor { key: String },
     /// Move a window to the next workspace on the currently focused monitor
     MoveWindowToNextWorkspace,
     /// Move a window to the previous workspace on the currently focused monitor
@@ -31,16 +31,16 @@ pub enum Command {
 }
 
 impl Command {
-    pub fn run(&self) -> AppResult<()> {
+    pub fn run(&self, config: Config) -> AppResult<()> {
+        let hyprland = Hyprland::new(config);
+
         match self {
             Command::Config => println!("Config"),
-            Command::FocusMonitor { monitor_id } => {
-                println!("FocusMonitor - monitor_id: {}", monitor_id)
-            }
+            Command::FocusMonitor { key } => hyprland.focus_monitor(key.to_string())?,
             Command::NextWorkspace => println!("NextWorkspace"),
             Command::PrevWorkspace => println!("PrevWorkspace"),
-            Command::MoveWindowToMonitor { monitor_id } => {
-                println!("MoveWindowToMonitor - monitor_id: {}", monitor_id)
+            Command::MoveWindowToMonitor { key } => {
+                println!("MoveWindowToMonitor - key: {}", key)
             }
             Command::MoveWindowToNextWorkspace => println!("MoveWindowToNextWorkspace"),
             Command::MoveWindowToPrevWorkspace => println!("MoveWindowToPrevWorkspace"),
