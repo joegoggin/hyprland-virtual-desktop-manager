@@ -39,4 +39,11 @@ impl Hyprctl {
 
         Ok(())
     }
+
+    pub fn move_to_workspace(workspace_id: u64) -> AppResult<()> {
+        let command = format!("hyprctl dispatch movetoworkspace {}", workspace_id);
+        TerminalCommand::new(command).run()?;
+
+        Ok(())
+    }
 }

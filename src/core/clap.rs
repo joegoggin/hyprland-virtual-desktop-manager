@@ -26,8 +26,6 @@ pub enum Command {
     MoveWindowToNextWorkspace,
     /// Move a window to the previous workspace on the currently focused monitor
     MoveWindowToPrevWorkspace,
-    /// Close a window and remove virtual desktop if empty
-    Close,
 }
 
 impl Command {
@@ -40,11 +38,10 @@ impl Command {
             Command::NextWorkspace => hyprland.next_workspace()?,
             Command::PrevWorkspace => hyprland.prev_workspace()?,
             Command::MoveWindowToMonitor { key } => {
-                println!("MoveWindowToMonitor - key: {}", key)
+                hyprland.move_window_to_monitor(key.to_string())?
             }
             Command::MoveWindowToNextWorkspace => println!("MoveWindowToNextWorkspace"),
             Command::MoveWindowToPrevWorkspace => println!("MoveWindowToPrevWorkspace"),
-            Command::Close => println!("Close"),
         }
 
         Ok(())
