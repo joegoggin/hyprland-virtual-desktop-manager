@@ -3,7 +3,7 @@ use serde_json::Value;
 
 use crate::utils::{terminal_command::TerminalCommand, value::GetOrDefault};
 
-use super::{app::AppResult, config::Config, monitor::Monitor};
+use super::{app::AppResult, config::Config, hyprctl::Hyprctl, monitor::Monitor};
 
 #[derive(Debug)]
 pub struct Hyprland {
@@ -73,18 +73,6 @@ impl Hyprland {
         Ok(())
     }
 
-    fn get_monitor_values(&self) -> AppResult<Vec<Value>> {
-        let output = TerminalCommand::new("hyprctl monitors -j").run_with_output()?;
-        let json: Value = serde_json::from_str(&output)?;
-        let mut monitor_values: Vec<Value> = vec![];
-
-        if let Value::Array(values) = json {
-            monitor_values = values;
-        }
-
-        Ok(monitor_values)
-    }
-
     fn get_active_monitor(&self) -> AppResult<Monitor> {
         let active_monitor_id = self.get_active_monitor_id()?;
 
@@ -98,7 +86,7 @@ impl Hyprland {
     }
 
     fn get_active_monitor_id(&self) -> AppResult<u64> {
-        let monitor_values = self.get_monitor_values()?;
+        let monitor_values = Hyprctl::monitors()?;
         let mut active_monitor_id = 0;
 
         for value in monitor_values {
@@ -113,7 +101,7 @@ impl Hyprland {
     }
 
     fn get_active_workspace_id(&self, monitor_id: u64) -> AppResult<u64> {
-        let monitor_values = self.get_monitor_values()?;
+        let monitor_values = Hyprctl::monitors()?;
         let mut active_workspace_id = 0;
 
         for value in monitor_values {
