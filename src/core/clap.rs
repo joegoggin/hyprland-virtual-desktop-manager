@@ -40,7 +40,7 @@ impl Command {
             Command::MoveWindowToMonitor { key } => {
                 hyprland.move_window_to_monitor(key.to_string())?
             }
-            Command::MoveWindowToNextWorkspace => println!("MoveWindowToNextWorkspace"),
+            Command::MoveWindowToNextWorkspace => hyprland.move_window_to_next_workspace()?,
             Command::MoveWindowToPrevWorkspace => println!("MoveWindowToPrevWorkspace"),
         }
 
