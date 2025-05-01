@@ -14,8 +14,6 @@ pub struct Args {
 pub enum Command {
     /// Initialize workspaces to match expected setup
     InitalizeWorkspaces,
-    /// Setup monitor configuration
-    Config,
     /// Focus a specific monitor
     FocusMonitor { key: String },
     /// Go to the next workspace on the currently focused monitor
@@ -38,10 +36,9 @@ impl Command {
 
         match self {
             Command::InitalizeWorkspaces => hyprland.initialize_workspaces()?,
-            Command::Config => println!("Config"),
             Command::FocusMonitor { key } => hyprland.focus_monitor(key.to_string())?,
             Command::NextWorkspace => hyprland.next_workspace()?,
-            Command::PrevWorkspace => println!("PrevWorkspace"),
+            Command::PrevWorkspace => hyprland.prev_workspace()?,
             Command::MoveWindowToMonitor { key } => {
                 println!("MoveWindowToMonitor - key: {}", key)
             }

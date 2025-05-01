@@ -45,6 +45,21 @@ impl Hyprland {
         Ok(())
     }
 
+    pub fn prev_workspace(&self) -> AppResult<()> {
+        let monitor = self.get_active_monitor()?;
+        let workspace_id = self.get_active_workspace_id(monitor.id)?;
+        let mut new_workspace_id = workspace_id - 1;
+
+        if new_workspace_id < monitor.min_workspace_id {
+            new_workspace_id = monitor.max_workspace_id;
+        }
+
+        let command = format!("hyprctl dispatch workspace {}", new_workspace_id);
+        TerminalCommand::new(command).run()?;
+
+        Ok(())
+    }
+
     pub fn focus_monitor(&self, key: String) -> AppResult<()> {
         let monitor = self.config.monitors.get(&key);
 
