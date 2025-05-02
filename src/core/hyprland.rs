@@ -85,8 +85,19 @@ impl Hyprland {
     }
 
     pub fn focus_workspace(&self, order_num: u64) -> AppResult<()> {
-        let workspace_id = self.get_orderd_workspace_id(order_num)?;
+        let ordered_workspace_id = self.get_orderd_workspace_id(order_num)?;
 
+        Hyprctl::go_to_workspace(ordered_workspace_id)?;
+
+        Ok(())
+    }
+
+    pub fn move_window_to_workspace(&self, order_num: u64) -> AppResult<()> {
+        let monitor_id = self.get_active_monitor_id()?;
+        let workspace_id = self.get_active_workspace_id(monitor_id)?;
+        let ordered_workspace_id = self.get_orderd_workspace_id(order_num)?;
+
+        Hyprctl::move_to_workspace(ordered_workspace_id)?;
         Hyprctl::go_to_workspace(workspace_id)?;
 
         Ok(())
