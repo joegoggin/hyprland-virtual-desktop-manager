@@ -71,15 +71,20 @@ impl FocusCommand {
 
 #[derive(Subcommand, Debug, Clone)]
 pub enum MoveWindowCommand {
-    /// Move a window to a specific monitor
+    /// Move current window to a specific monitor
     Monitor {
         /// The key associated with the monitor you would like to move the current window to
         key: String,
     },
-    /// Move a window to the next workspace on the currently focused monitor
+    /// Move current window to the next workspace on the currently focused monitor
     NextWorkspace,
-    /// Move a window to the previous workspace on the currently focused monitor
+    /// Move current window to the previous workspace on the currently focused monitor
     PrevWorkspace,
+    /// Move current window to a specific workspace on current focused monitor
+    Workspace {
+        /// A number between 1 and 5 that represents the workspace position on your current monitor
+        order_num: u64,
+    },
 }
 
 impl MoveWindowCommand {
@@ -88,6 +93,9 @@ impl MoveWindowCommand {
             MoveWindowCommand::Monitor { key } => hyprland.move_window_to_monitor(key.to_string()),
             MoveWindowCommand::NextWorkspace => hyprland.move_window_to_next_workspace(),
             MoveWindowCommand::PrevWorkspace => hyprland.move_window_to_prev_workspace(),
+            MoveWindowCommand::Workspace { order_num } => {
+                hyprland.move_window_to_workspace(order_num.to_owned())
+            }
         }
     }
 }
