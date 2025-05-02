@@ -14,22 +14,15 @@ pub struct Args {
 pub enum Command {
     /// Initialize workspaces to match expected setup
     InitalizeWorkspaces,
-    /// Focus a specific monitor
-    FocusMonitor { key: String },
-    /// Go to the next workspace on the currently focused monitor
-    NextWorkspace,
-    /// Go to the previous workspace on the currently focused monitor
-    PrevWorkspace,
-    /// Move a window to a specific monitor
-    MoveWindowToMonitor { key: String },
-    /// Move a window to the next workspace on the currently focused monitor
-    MoveWindowToNextWorkspace,
-    /// Move a window to the previous workspace on the currently focused monitor
-    MoveWindowToPrevWorkspace,
-    /// Go to a specific workspace on current focused monitor
-    FocusWorkspace {
-        /// A number between 1 and 5 that represents the workspace position on your current monitor
-        order_num: u64,
+    /// Change focus
+    Focus {
+        #[command(subcommand)]
+        focus_command: FocusCommand,
+    },
+    /// Move current window
+    MoveWindow {
+        #[command(subcommand)]
+        move_window_command: MoveWindowCommand,
     },
 }
 
@@ -38,20 +31,60 @@ impl Command {
         let hyprland = Hyprland::new(config);
 
         match self {
-            Command::InitalizeWorkspaces => hyprland.initialize_workspaces()?,
-            Command::FocusMonitor { key } => hyprland.focus_monitor(key.to_string())?,
-            Command::NextWorkspace => hyprland.next_workspace()?,
-            Command::PrevWorkspace => hyprland.prev_workspace()?,
-            Command::MoveWindowToMonitor { key } => {
-                hyprland.move_window_to_monitor(key.to_string())?
-            }
-            Command::MoveWindowToNextWorkspace => hyprland.move_window_to_next_workspace()?,
-            Command::MoveWindowToPrevWorkspace => hyprland.move_window_to_prev_workspace()?,
-            Command::FocusWorkspace { order_num } => {
-                hyprland.focus_workspace(order_num.to_owned())?
-            }
+            Command::InitalizeWorkspaces => hyprland.initialize_workspaces(),
+            Command::Focus { focus_command } => focus_command.run(hyprland),
+            Command::MoveWindow {
+                move_window_command,
+            } => move_window_command.run(hyprland),
         }
+    }
+}
 
-        Ok(())
+#[derive(Subcommand, Debug, Clone)]
+pub enum FocusCommand {
+    /// Focus a specific monitor
+    Monitor {
+        /// The key (set in your config) associated with the monitor you would like to focus
+        key: String,
+    },
+    /// Focus the next workspace on the currently focused monitor
+    NextWorkspace,
+    /// Focus the previous workspace on the currently focused monitor
+    PrevWorkspace,
+    /// Focus a specific workspace on current focused monitor
+    Workspace {
+        /// A number between 1 and 5 that represents the workspace position on your current monitor
+        order_num: u64,
+    },
+}
+
+impl FocusCommand {
+    pub fn run(&self, hyprland: Hyprland) -> AppResult<()> {
+        match self {
+            FocusCommand::Monitor { key } => hyprland.focus_monitor(key.to_string()),
+            FocusCommand::NextWorkspace => hyprland.next_workspace(),
+            FocusCommand::PrevWorkspace => hyprland.prev_workspace(),
+            FocusCommand::Workspace { order_num } => hyprland.focus_workspace(order_num.to_owned()),
+        }
+    }
+}
+
+#[derive(Subcommand, Debug, Clone)]
+pub enum MoveWindowCommand {
+    /// Move a window to a specific monitor
+    Monitor { key: String },
+    /// Move a window to the next workspace on the currently focused monitor
+    NextWorkspace,
+    /// Move a window to the previous workspace on the currently focused monitor
+    PrevWorkspace,
+}
+
+impl MoveWindowCommand {
+    pub fn run(&self, hyprland: Hyprland) -> AppResult<()> {
+        match self {
+            MoveWindowCommand::Monitor { key } => hyprland.move_window_to_monitor(key.to_string()),
+            MoveWindowCommand::NextWorkspace => hyprland.move_window_to_next_workspace(),
+            MoveWindowCommand::PrevWorkspace => hyprland.move_window_to_prev_workspace(),
+        }
     }
 }
