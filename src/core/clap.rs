@@ -44,7 +44,7 @@ impl Command {
 pub enum FocusCommand {
     /// Focus a specific monitor
     Monitor {
-        /// The key (set in your config) associated with the monitor you would like to focus
+        /// The key associated with the monitor you would like to focus
         key: String,
     },
     /// Focus the next workspace on the currently focused monitor
@@ -72,7 +72,10 @@ impl FocusCommand {
 #[derive(Subcommand, Debug, Clone)]
 pub enum MoveWindowCommand {
     /// Move a window to a specific monitor
-    Monitor { key: String },
+    Monitor {
+        /// The key associated with the monitor you would like to move the current window to
+        key: String,
+    },
     /// Move a window to the next workspace on the currently focused monitor
     NextWorkspace,
     /// Move a window to the previous workspace on the currently focused monitor
