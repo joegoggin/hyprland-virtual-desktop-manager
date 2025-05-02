@@ -26,6 +26,11 @@ pub enum Command {
     MoveWindowToNextWorkspace,
     /// Move a window to the previous workspace on the currently focused monitor
     MoveWindowToPrevWorkspace,
+    /// Go to a specific workspace on current focused monitor
+    FocusWorkspace {
+        /// A number between 1 and 5 that represents the workspace position on your current monitor
+        order_num: u64,
+    },
 }
 
 impl Command {
@@ -42,6 +47,9 @@ impl Command {
             }
             Command::MoveWindowToNextWorkspace => hyprland.move_window_to_next_workspace()?,
             Command::MoveWindowToPrevWorkspace => hyprland.move_window_to_prev_workspace()?,
+            Command::FocusWorkspace { order_num } => {
+                hyprland.focus_workspace(order_num.to_owned())?
+            }
         }
 
         Ok(())

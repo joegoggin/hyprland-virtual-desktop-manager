@@ -84,6 +84,25 @@ impl Hyprland {
         Ok(())
     }
 
+    pub fn focus_workspace(&self, order_num: u64) -> AppResult<()> {
+        let workspace_id = self.get_orderd_workspace_id(order_num)?;
+
+        Hyprctl::go_to_workspace(workspace_id)?;
+
+        Ok(())
+    }
+
+    fn get_orderd_workspace_id(&self, order_num: u64) -> AppResult<u64> {
+        if order_num < 1 || order_num > 5 {
+            return Err(Error::msg("Order number must be between 1 and 5"));
+        }
+
+        let monitor = self.get_active_monitor()?;
+        let ordered_workspace_id = (order_num - 1) + monitor.min_workspace_id;
+
+        Ok(ordered_workspace_id)
+    }
+
     fn get_next_workspace_id(&self) -> AppResult<u64> {
         let monitor = self.get_active_monitor()?;
         let workspace_id = self.get_active_workspace_id(monitor.id)?;
