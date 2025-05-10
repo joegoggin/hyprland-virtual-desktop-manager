@@ -15,3 +15,25 @@ desktop management I required. To streamline this experience and provide
 a more robust solution, I consolidated these scripts and rewrote them in 
 Rust, resulting in a comprehensive tool for efficient virtual desktop 
 management on Hyprland.
+
+## Usage
+
+### `initialize-workspaces`
+
+**Command:** `hyprland-vdm initialize-workspaces`
+
+The `initialize-workspaces` command configures the current workspaces on 
+each monitor to align with the expectations of the tool. This utility 
+manages workspaces by incrementing and decrementing their respective ID 
+numbers. For proper functionality, it is essential that workspaces are 
+correctly initialized; otherwise, the tool may not operate as intended.
+
+To automate this process, add the following line to your Hyprland 
+configuration file:
+
+```
+exec-once = hyprland-vdm initialize-workspaces
+```
+
+This ensures that workspace initialization occurs automatically each time 
+Hyprland starts.

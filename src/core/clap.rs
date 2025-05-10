@@ -13,7 +13,7 @@ pub struct Args {
 #[derive(Subcommand, Debug, Clone)]
 pub enum Command {
     /// Initialize workspaces to match expected setup
-    InitalizeWorkspaces,
+    InitializeWorkspaces,
     /// Change focus
     Focus {
         #[command(subcommand)]
@@ -31,7 +31,7 @@ impl Command {
         let hyprland = Hyprland::new(config);
 
         match self {
-            Command::InitalizeWorkspaces => hyprland.initialize_workspaces(),
+            Command::InitializeWorkspaces => hyprland.initialize_workspaces(),
             Command::Focus { focus_command } => focus_command.run(hyprland),
             Command::MoveWindow {
                 move_window_command,
