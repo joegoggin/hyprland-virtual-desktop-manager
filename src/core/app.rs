@@ -16,7 +16,7 @@ impl App {
         let result = config.load_from_file();
 
         if let Err(_) = result {
-            config.prompt_user().await?;
+            config.prompt_user()?;
         }
 
         let args = Args::parse();
