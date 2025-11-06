@@ -12,8 +12,8 @@ pub struct Args {
 
 #[derive(Subcommand, Debug, Clone)]
 pub enum Command {
-    /// Initialize workspaces to match expected setup
-    InitalizeWorkspaces,
+    /// Generate configuration for Hyprland Virtual Desktop Manger
+    Config,
     /// Change focus
     Focus {
         #[command(subcommand)]
@@ -27,11 +27,11 @@ pub enum Command {
 }
 
 impl Command {
-    pub fn run(&self, config: Config) -> AppResult<()> {
-        let hyprland = Hyprland::new(config);
+    pub fn run(&self, mut config: Config) -> AppResult<()> {
+        let hyprland = Hyprland::new(config.clone());
 
         match self {
-            Command::InitalizeWorkspaces => hyprland.initialize_workspaces(),
+            Command::Config => config.prompt_user(),
             Command::Focus { focus_command } => focus_command.run(hyprland),
             Command::MoveWindow {
                 move_window_command,
