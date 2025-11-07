@@ -16,6 +16,51 @@ a more robust solution, I consolidated these scripts and rewrote them in
 Rust, resulting in a comprehensive tool for efficient workspace management 
 on Hyprland.
 
+## Installation
+
+### Step 1
+
+Clone the repository 
+
+```
+$ git clone https://github.com/joegoggin/hyprland-workspace-manager.git
+```
+
+### Step 2
+
+Change directory to the `hyprland-workspace-manager` directory.
+
+```
+$ cd hyprland-workspace-manager 
+```
+
+### Step 3
+
+Run install script
+
+**Note:** This command requires you to have the command runner 
+[just](https://github.com/casey/just) installed.
+
+```
+$ just install
+```
+
+### Step 4
+
+Add the following line to your `.bashrc` 
+
+```
+export PATH="$HOME/.local/bin:$PATH"
+```
+
+### Step 5
+
+Setup Hyprland Workspace Manager configuration
+
+```
+$ hyprland-wm config 
+```
+
 ## Usage
 
 ### `config`
@@ -121,6 +166,7 @@ window to the first workspace assigned to that monitor.
 
 The `move-window workspace` command moves the currently to a specific workspace 
 associated with the currently focused monitor. This command expects an 
-ordinal number corresponding to the workspace index, ranging from 1 up to the total number of workspaces assigned to that monitor (five by default). For example, 
-running `hyprland-wm focus workspace 3` will move the window to the third 
+ordinal number corresponding to the workspace index, ranging from 1 up to the 
+total number of workspaces assigned to that monitor (five by default). For example, 
+running `hyprland-wm move-window workspace 3` will move the window to the third 
 workspace assigned to the active monitor.
