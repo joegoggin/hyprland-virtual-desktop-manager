@@ -1,6 +1,5 @@
 use clap::Parser;
 
-#[allow(unused_imports)]
 use super::{clap::Args, config::Config};
 
 pub type AppResult<T> = anyhow::Result<T>;
@@ -13,17 +12,16 @@ impl App {
     }
 
     pub async fn run(&self) -> AppResult<()> {
-        // let mut config = Config::default();
-        // let result = config.load_from_file();
-        //
-        // if let Err(_) = result {
-        //     config.prompt_user().await?;
-        // }
+        let mut config = Config::default();
+        let result = config.load_from_file();
 
-        #[allow(unused_variables)]
+        if let Err(_) = result {
+            config.prompt_user()?;
+        }
+
         let args = Args::parse();
 
-        // args.command.run(config)?;
+        args.command.run(config)?;
 
         Ok(())
     }
