@@ -4,7 +4,7 @@ use super::{app::AppResult, config::Config, hyprland::Hyprland};
 
 #[derive(Parser, Debug, Clone)]
 #[command(author, version, about)]
-/// Hyprland Virtual Desktop Manager - Control Virtual Desktops In Hyprland On Multiple Monitors
+/// Hyprland Workspace Manager - Control Workspaces In Hyprland On Multiple Monitors
 pub struct Args {
     #[command(subcommand)]
     pub command: Command,
@@ -12,7 +12,7 @@ pub struct Args {
 
 #[derive(Subcommand, Debug, Clone)]
 pub enum Command {
-    /// Generate configuration for Hyprland Virtual Desktop Manger
+    /// Generate configuration for Hyprland Workspace Manger
     Config,
     /// Change focus
     Focus {
