@@ -1,5 +1,5 @@
 use colorized::{Colors, colorize_println};
-use hyprland_vdm::core::app::App;
+use hyprland_workspace_manager::core::app::App;
 
 #[tokio::main]
 async fn main() {

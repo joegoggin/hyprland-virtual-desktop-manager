@@ -58,20 +58,20 @@ export PATH="$HOME/.local/bin:$PATH"
 Setup Hyprland Workspace Manager configuration
 
 ```
-$ hyprland-wm config 
+$ hyprland-workspace-manager config 
 ```
 
 ## Usage
 
 ### `config`
 
-**Command:** `hyprland-wm config`
+**Command:** `hyprland-workspace-manager config`
 
 The `config` command assists you in creating a configuration file for Hyprland 
 Workspace Manager. This tool automatically detects your connected monitors and 
 allows you to assign a key (a nickname used to refer to the monitor) for each 
 monitor for use with other commands. Once generated, the configuration file is 
-saved to `~/.config/hyprland-wm/config.json`.
+saved to `~/.config/hyprland-workspace-manager/config.json`.
 
 In addition to creating the configuration file, the `config` command updates 
 your Hyprland configuration to map the appropriate workspaces to each monitor.
@@ -84,89 +84,128 @@ within your configuration file.
 
 #### `monitor`
 
-**Command:** `hyprland-wm focus monitor <KEY>`
+**Command:** `hyprland-workspace-manager focus monitor <KEY>`
 
 The `focus monitor` command allows you to focus a specific monitor based on the
 key assigned in your configuration. For example, if a monitor is assigned the 
-key `left`, running `hyprland-wm focus monitor left` will shift focus to that
+key `left`, running `hyprland-workspace-manager focus monitor left` will shift focus to that
 monitor.
 
 #### `next-workspace`
 
-**Command:** `hyprland-wm focus next-workspace`
+**Command:** `hyprland-workspace-manager focus next-workspace`
 
 The `focus next-workspace` command shifts focus to the next workspace relative to 
 the focused monitor. For example, if each monitor is assigned 
 five workspaces (the default amount) and you are on the first workspace on that
-monitor, running `hyprland-wm focus next-workspace` will move focus to the 
+monitor, running `hyprland-workspace-manager focus next-workspace` will move focus to the 
 second workspace on that monitor. When executed from the fifth (last) workspace, 
 the command cycles back to the first workspace assigned to that monitor.
 
 #### `prev-workspace`
 
-**Command:** `hyprland-wm focus prev-workspace`
+**Command:** `hyprland-workspace-manager focus prev-workspace`
 
 The `focus prev-workspace` command shifts focus to the previous workspace relative
 to your focused monitor. For example, if each monitor is assigned 
 five workspaces (the default amount) and you are on the second workspace on that
-monitor, running `hyprland-wm focus prev-workspace` will move focus to the 
+monitor, running `hyprland-workspace-manager focus prev-workspace` will move focus to the 
 first workspace on that monitor. When executed from the first workspace, 
 the command cycles back to the fifth (last) workspace assigned to that monitor.
 
 #### `workspace`
 
-**Command:** `hyprland-wm focus workspace <ORDER_NUM>`
+**Command:** `hyprland-workspace-manager focus workspace <ORDER_NUM>`
 
 The `focus workspace` command shifts focus to a specific workspace associated with 
 the currently focused monitor. This command expects an ordinal number corresponding
 to the workspace index, ranging from 1 up to the total number of workspaces assigned
 to that monitor (five by default). For example, running 
-`hyprland-wm focus workspace 3` will move focus to the third workspace assigned 
+`hyprland-workspace-manager focus workspace 3` will move focus to the third workspace assigned 
 to the active monitor.
 
 ### `move-window`
 
 #### `monitor`
 
-**Command:** `hyprland-wm move-window monitor <KEY>`
+**Command:** `hyprland-workspace-manager move-window monitor <KEY>`
 
 The `move-window monitor` command will move the currently focused window to the
 active workspace on a specific monitor based off of the key assigned in your
 configuration. For example, if a monitor is assigned the key `left`, running 
-`hyprland-wm move-window monitor left` will move the currently focused window
+`hyprland-workspace-manager move-window monitor left` will move the currently focused window
 to the active window on that monitor.
 
 #### `next-workspace`
 
-**Command:** `hyprland-wm move-window next-workspace`
+**Command:** `hyprland-workspace-manager move-window next-workspace`
 
 The `focus move-window` command moves the currently focused window to the next
 workspace on the focused monitor. For example, if each monitor is assigned 
 five workspaces (the default amount) and you are on the first workspace on that
-monitor, running `hyprland-wm move-window next-workspace` will move the
+monitor, running `hyprland-workspace-manager move-window next-workspace` will move the
 currently focused window to the second workspace on the current monitor. When 
 executed from the fifth (last) workspace, the command cycles back and moves the
 window to the first workspace assigned to that monitor.
 
 #### `prev-workspace`
 
-**Command:** `hyprland-wm move-window prev-workspace`
+**Command:** `hyprland-workspace-manager move-window prev-workspace`
 
 The `focus prev-window` command moves the currently focused window to the
 previous workspace on the focused monitor. For example, if each monitor is assigned 
 five workspaces (the default amount) and you are on the second workspace on that
-monitor, running `hyprland-wm move-window next-workspace` will move the
+monitor, running `hyprland-workspace-manager move-window next-workspace` will move the
 currently focused window to the first workspace on the current monitor. When 
 executed from the fifth workspace, the command cycles back and moves the
 window to the first workspace assigned to that monitor.
 
 #### `workspace`
 
-**Command:** `hyprland-wm move-window workspace <ORDER_NUM>`
+**Command:** `hyprland-workspace-manager move-window workspace <ORDER_NUM>`
 
 The `move-window workspace` command moves the currently to a specific workspace 
 associated with the currently focused monitor. This command expects an 
 ordinal number corresponding to the workspace index, ranging from 1 up to the 
 total number of workspaces assigned to that monitor (five by default). For example, 
-running `hyprland-wm move-window workspace 3` will move the window to the third 
+running `hyprland-workspace-manager move-window workspace 3` will move the window to the third 
 workspace assigned to the active monitor.
+
+### Scripts
+
+All these scripts must be run from the root directory of the project. They also
+all require [just](https://github.com/casey/just) to be installed.
+
+#### `run`
+
+**Command:** `just run <COMMAND>`
+
+The `run` script is just an alias for `cargo run -q -- <COMMAND>`.
+
+### `build` 
+
+**Command:** `just build`
+
+**Note:** This command requires [cargo-watch](https://crates.io/crates/cargo-watch) to be installed.
+
+The `build` script is just and alias for `cargo-watch -c -x "build"` 
+
+### `build-release` 
+
+**Command:** `just build-release`
+
+The `build-release` script is just alias for `cargo build --release`
+
+### `install` 
+
+**Command:** `just install`
+
+The `install` script will build your project and add it to the `~/.local/bin` directory. If
+this directory does not exist the directory will be created. Once this is run
+you just be able to use the `hyprland-workspace-manager` command from any directory in your
+terminal.
+
+### `uninstall`
+
+The `uninstall` script will remove the program from your `~/.local/bin`
+directory.
